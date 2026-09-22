@@ -1,0 +1,56 @@
+## Git configuration for the user's environment.
+## The file configures sane defaults for new repositories, merges and
+## fetch/push behavior, and provides a few handy aliases for common
+## operations. Uncomment and set the `[user]` section for your identity.
+
+# [user]
+#     name = Your Name
+#     email = you@example.com
+
+[init]
+    defaultBranch = main
+
+[core]
+    editor = nano
+    excludesFile = ~/.config/git/ignore
+    pager = delta
+
+[interactive]
+    diffFilter = delta --color-only
+
+[delta]
+    navigate = true
+    line-numbers = true
+    side-by-side = true
+    syntax-theme = none
+
+[merge]
+    conflictStyle = zdiff3
+
+[pull]
+    ff = only
+
+[push]
+    autoSetupRemote = true
+
+[fetch]
+    prune = true
+
+[rebase]
+    autoStash = true
+
+[diff]
+    algorithm = histogram
+
+[alias]
+    st = status --short --branch
+    ci = commit
+    co = checkout
+    br = branch
+    lg = log --graph --decorate --oneline --all
+
+[filter "lfs"]
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    process = git-lfs filter-process
+    required = true

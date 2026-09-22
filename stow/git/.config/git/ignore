@@ -1,0 +1,8 @@
+.gitignore for editor and OS artifacts
+# Keep generated or editor-specific files out of Git commits by default.
+
+.DS_Store
+*.swp
+*.swo
+*~
+**/*:Zone.Identifier

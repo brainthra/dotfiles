@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+# Determine the absolute path to the repository root.
+#
+# Redirecting stdout/stderr from cd avoids unnecessary output.
+repo_root="$(
+  cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." >/dev/null 2>&1
+  pwd
+)"
+
+# -------------------------------------------------------------------
+# Install required operating system packages.
+# -------------------------------------------------------------------
+"$repo_root/scripts/install-system-packages"
+
+# -------------------------------------------------------------------
+# Install the Nix package manager if it is not already installed.
+#
+# Nix will later be used to install and configure the user's
+# development environment through Home Manager.
+# -------------------------------------------------------------------
+"$repo_root/scripts/install-nix"
+
+
+# Single-user installation
+if [[ -e "$HOME/.nix-profile/etc/profile.d/nix.sh" ]]; then
+    # shellcheck disable=SC1091
+    #
+    # Source the shell initialization script that adds the Nix
+    # executables to PATH and configures environment variables.
+    source "$HOME/.nix-profile/etc/profile.d/nix.sh"
+    # print "Single-user Nix installation detected. Sourced nix.sh."
+    printf 'Single-user Nix installation detected. Sourced nix.sh.\n'
+
+# Multi-user installation
+elif [[ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
+    # shellcheck disable=SC1091
+    #
+    # Multi-user installations use the daemon profile instead.
+    source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+    # print "Multi-user Nix installation detected. Sourced nix-daemon.sh."
+    printf 'Multi-user Nix installation detected. Sourced nix-daemon.sh.\n'
+fi
+
+# -------------------------------------------------------------------
+# Verify that the `nix` command is now available.
+#
+# If it still isn't, something prevented the shell initialization
+# script from taking effect.
+#
+# Rather than continuing and producing confusing errors later,
+# stop immediately with a helpful message.
+# -------------------------------------------------------------------
+if ! command -v nix >/dev/null 2>&1; then
+    printf 'Nix was installed, but is not available in this shell.\n' >&2
+    printf 'Open a new shell and rerun this script.\n' >&2
+    exit 1
+fi
+
+# -------------------------------------------------------------------
+# Apply the Home Manager configuration.
+#-------------------------------------------------------------------
+nix run github:nix-community/home-manager -- switch --flake .#$USER
+
+# -------------------------------------------------------------------
+# Install Oh My Zsh.
+# -------------------------------------------------------------------
+"$repo_root/scripts/install-oh-my-zsh"
+"$repo_root/scripts/install-micromamba"
+
+# -------------------------------------------------------------------
+# Create symlinks from the repository's configuration files into the home directory.
+# -------------------------------------------------------------------
+"$repo_root/scripts/link-dotfiles"
+
+
+# -------------------------------------------------------------------
+# Install Git LFS.
+# -------------------------------------------------------------------
+git lfs install
+
+
+# -------------------------------------------------------------------
+# Final status message.
+#
+# Installing Zsh does not automatically make it the user's default
+# login shell. The user can choose to do that manually by running
+# the displayed command.
+# -------------------------------------------------------------------
+printf '\nBootstrap complete.\n'
+printf 'To make Zsh your login shell, run:\n'
+printf '%s\n' "  chsh -s \"$(command -v zsh)\""

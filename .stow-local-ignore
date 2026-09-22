@@ -1,0 +1,14 @@
+# Local ignore list for GNU Stow operations
+# Patterns listed here are excluded from stow operations and are intended
+# to keep local repository metadata and generated files from being staged
+# or processed by stow.
+
+\.git
+\.gitignore
+\.stow-local-ignore
+flake\.nix
+flake\.lock
+README\.md
+Makefile
+home
+scripts

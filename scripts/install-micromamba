@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+install_dir="${HOME}/.local/bin"
+root_prefix="${XDG_DATA_HOME:-$HOME/.local/share}/micromamba"
+
+mkdir -p "$install_dir"
+mkdir -p "$root_prefix"
+
+if command -v micromamba >/dev/null 2>&1; then
+  printf 'Micromamba is already installed: %s\n' \
+    "$(command -v micromamba)"
+  exit 0
+fi
+
+printf 'Installing Micromamba from the official installer...\n'
+
+curl -Ls https://micro.mamba.pm/install.sh | bash -s -- \
+  -b "$install_dir" \
+  -r "$root_prefix"
+
+
+# printf 'Removing the shell initialization code from the installer script...\n'
+# sed -i '/# >>> mamba initialize >>>/,/# <<< mamba initialize <<</d' ~/.bashrc
+
+if [[ ! -x "$install_dir/micromamba" ]]; then
+  printf 'Micromamba installation failed.\n' >&2
+  exit 1
+fi
+
+"$install_dir/micromamba" --version
+
+printf '\nMicromamba installed at:\n'
+printf '  %s\n' "$install_dir/micromamba"
+printf 'Root prefix:\n'
+printf '  %s\n' "$root_prefix"

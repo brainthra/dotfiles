@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+packages=(
+  zsh
+  build-essential
+  pkg-config
+  git
+  curl
+  ca-certificates
+  gnupg
+  openssh-client
+  dnsutils
+  stow
+)
+
+if ! command -v apt-get >/dev/null 2>&1; then
+  printf 'Unsupported system: apt-get was not found.\n' >&2
+  exit 1
+fi
+
+sudo apt-get update
+sudo apt-get install -y "${packages[@]}"

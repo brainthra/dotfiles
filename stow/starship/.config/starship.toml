@@ -1,0 +1,147 @@
+# starship.toml
+#
+#
+# Keep this configuration intentionally small. Modules should be added only
+# when the corresponding tool or language becomes part of the active workflow.
+# A Nerd Font is recommended for the symbols used below.
+
+"$schema" = "https://starship.rs/config-schema.json"
+
+add_newline = true
+scan_timeout = 20
+command_timeout = 800
+
+format = """
+$directory\
+$git_branch\
+$git_commit\
+$git_state\
+$git_status\
+$conda\
+$python\
+$nodejs\
+$java\
+$line_break\
+$jobs\
+$status\
+$shell\
+$character"""
+
+right_format = "$cmd_duration"
+
+continuation_prompt = "[\u2219](bright-black) "
+
+# ---------------------------------------------------------------------------
+# Shell / working-directory context
+# ---------------------------------------------------------------------------
+
+[directory]
+style = "bold blue"
+read_only = " \uF023"
+read_only_style = "red"
+truncation_length = 4
+truncate_to_repo = true
+format = "[$path]($style)[$read_only]($read_only_style) "
+
+# ---------------------------------------------------------------------------
+# Git
+# ---------------------------------------------------------------------------
+
+[git_branch]
+symbol = "\uF418 "
+style = "bold purple"
+format = "[$symbol$branch(:$remote_branch)]($style) "
+
+[git_commit]
+only_detached = true
+tag_disabled = false
+tag_symbol = " \uF412 "
+style = "bold yellow"
+format = "[$hash$tag]($style) "
+
+[git_state]
+style = "bold yellow"
+format = '\\([$state( $progress_current/$progress_total)]($style)\\) '
+
+[git_status]
+style = "bold red"
+format = "([$all_status$ahead_behind]($style) )"
+conflicted = "=${count}"
+ahead = "\u21E1${count}"
+behind = "\u21E3${count}"
+diverged = "\u21D5\u21E1${ahead_count}\u21E3${behind_count}"
+up_to_date = ""
+untracked = "?${count}"
+stashed = "\U000F03D7 ${count}"
+modified = "!${count}"
+staged = "+${count}"
+renamed = "\u00BB${count}"
+deleted = "\u2718${count}"
+
+# ---------------------------------------------------------------------------
+# Active language/runtime stack
+# ---------------------------------------------------------------------------
+
+[conda]
+symbol = "\uEC16 "
+style = "bold green"
+format = "[$symbol$environment]($style) "
+
+[python]
+symbol = "\uED1B "
+style = "bold yellow"
+format = "[$symbol$pyenv_prefix($version)(\\($virtualenv\\))]($style) "
+
+# TypeScript projects currently use the Node.js toolchain. Add Deno or Bun only
+# if either runtime becomes part of the active project workflow.
+[nodejs]
+symbol = "\uE718 "
+style = "bold green"
+format = "[$symbol($version)]($style) "
+
+[java]
+symbol = "\uE738 "
+style = "bold red"
+format = "[$symbol($version)]($style) "
+
+# ---------------------------------------------------------------------------
+# Shell feedback
+# ---------------------------------------------------------------------------
+
+[jobs]
+symbol = "\uF013 "
+style = "bold blue"
+number_threshold = 1
+symbol_threshold = 1
+format = "[$symbol$number]($style) "
+
+[status]
+disabled = false
+symbol = "\uEA87 "
+success_symbol = ""
+not_executable_symbol = "\U000F00AD"
+not_found_symbol = "\U000F0349"
+sigint_symbol = "\U000F00AD"
+signal_symbol = "\U000F140B"
+style = "bold red"
+format = "[$symbol$status]($style) "
+
+[shell]
+disabled = false
+bash_indicator = "bash"
+zsh_indicator = "zsh"
+powershell_indicator = "pwsh"
+unknown_indicator = "shell"
+style = "dimmed white"
+format = "[$indicator]($style) "
+
+[character]
+success_symbol = "[>](bold green)"
+error_symbol = "[>](bold red)"
+
+[cmd_duration]
+min_time = 1500
+show_milliseconds = false
+show_notifications = false
+style = "bold yellow"
+format = "[\uF31A $duration]($style) "
